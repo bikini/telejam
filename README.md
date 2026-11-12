@@ -1,6 +1,4 @@
-# telejam
 
-Private research package for a Telegram Desktop widget remote-code-execution vulnerability.
 
 ## Summary
 
